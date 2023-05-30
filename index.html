@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CRUD Application using JavaScript</title>
+    <link rel="stylesheet" href="./css/bootstrap.css">
+	<script src="./js/jquery-3.6.0.js"></script>
+    <script src="./js/bootstrap.js"></script>
+    <style>
+        table 
+        {
+            width: 100%;
+            font: 17px Calibri;
+        }
+        table, th, td 
+        {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+      
+        input[type='button'] 
+        {
+            font: 15px Calibri;
+            cursor: pointer;
+            border: none;
+            color: #FFF;
+        }
+        
+        input[type='text'], select 
+        {
+            font: 17px Calibri;
+            text-align: center;
+            border: solid 1px #CCC;
+            width: auto;
+            padding: 2px 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container" style="width:100%; align-content: center;" class="table table-responsive table-hover">
+    </div>
+
+    <!-- <div style="background-color: antiquewhite; width: 300px; padding: 10px;">
+        Route : <input type="text">
+        <br>
+        <P>1. AAJ -> Depo Jkt </P>
+        <P>ISOTANK :</P>
+        <P>CAR :</P>
+        <P>LOAD FROOM :</P>
+        <P>SHIP TO :</P>
+        <p>ITEM :</p>
+        
+
+        <button type="submit">+</button>
+    </div> -->
+
+    <div id="readroot" style="display: none">
+
+        <input type="submit" value="Remove review"
+            onclick="this.parentNode.parentNode.removeChild(this.parentNode);" /><br /><br />
+    
+        <input name="cd" value="title" />
+    
+        <select name="rankingsel">
+            <option>Rating</option>
+            <option value="excellent">Excellent</option>
+            <option value="good">Good</option>
+            <option value="ok">OK</option>
+            <option value="poor">Poor</option>
+            <option value="bad">Bad</option>
+        </select><br /><br />
+    
+        <textarea rows="5" cols="20" name="review">Short review</textarea>
+        <br />Radio buttons included to test them in Explorer:<br />
+        <input type="radio" name="something" value="test1" />Test 1<br />
+        <input type="radio" name="something" value="test2" />Test 2
+        
+        <!-- <input type="submit" value="Add block"
+        onclick="this.moreFields()" /><br /><br /> -->
+    </div>
+    <form method="post" action="">
+    
+        <span id="writeroot"></span>
+    
+        <input type="submit" name="moreFields" id="moreFields" value="Give me more fields!" />
+        <input type="submit" value="Send form" />
+    
+    </form>
+    
+</body>
+
+<script>
+    var crudApp = new function () {
+
+        // AN ARRAY OF JSON OBJECTS WITH VALUES.
+        this.myBooks = [
+            { Id: '1', Car : 'Adi', Isotank: '167283913', LoadFrom: 'A', ShipTo: 'A', Date: '1/1/1' , Item: 'H2O',Keterangan: '-'},
+            { Id: '2', Car : 'Budi', Isotank: '231214324', LoadFrom: 'B', ShipTo: 'A',Date: '11/1/1' , Item: 'H2O',Keterangan: '-'},
+            { Id: '3', Car : 'Andi', Isotank: '412411412', LoadFrom: 'C', ShipTo: 'A',Date: '11/1/1' , Item: 'H2O',Keterangan: '-'},
+        ]
+
+        this.category = ['A', 'B', 'C', 'D'];
+        this.col = [];
+
+        this.createTable = function () {
+            console.log(this.myBooks)
+
+            // EXTRACT VALUE FOR TABLE HEADER.
+            for (var i = 0; i < this.myBooks.length; i++) {
+                for (var key in this.myBooks[i]) {
+                    if (this.col.indexOf(key) === -1) {
+                        this.col.push(key);
+                    }
+                }
+            }
+
+            // CREATE A TABLE.
+            var table = document.createElement('table');
+            table.setAttribute('id', 'booksTable');     // SET TABLE ID.
+
+            // CREATE A ROW (FOR HEADER).
+            var tr = table.insertRow(-1);               
+            for (var h = 0; h < this.col.length; h++) {
+                // ADD TABLE HEADER.
+                var th = document.createElement('th');
+                th.innerHTML = this.col[h].replace('_', ' ');
+                tr.appendChild(th);
+            }
+            var th = document.createElement('th');
+            th.setAttribute('colspan', '2');
+            th.innerHTML = "Action";
+            tr.appendChild(th)
+
+            // ADD A ROW AT THE END WITH BLANK TEXTBOXES AND A DROPDOWN LIST (FOR NEW ENTRY).
+            tr = table.insertRow(-1);           // CREATE THE LAST ROW.
+    
+            for (var j = 0; j < this.col.length; j++) {
+                var newCell = tr.insertCell(-1);
+                if (j >= 1) {
+                    if (j == 1) {
+                        var tBox = document.createElement('input');          // CREATE AND ADD A TEXTBOX.
+                        tBox.setAttribute('type', 'text');
+                        tBox.setAttribute('value', '');
+                        tBox.setAttribute('id', 'in-isotank');
+                        newCell.appendChild(tBox);
+                    }
+                    if (j == 2) {   // WE'LL ADD A DROPDOWN LIST AT THE SECOND COLUMN (FOR Category).
+                        var tBox = document.createElement('input');          // CREATE AND ADD A TEXTBOX.
+                        tBox.setAttribute('type', 'text');
+                        tBox.setAttribute('value', '');
+                        tBox.setAttribute('id', 'in-car');
+                        newCell.appendChild(tBox);
+                        //tBox.appendChild('<img src="attention.png" alt="Girl in a jacket">');
+
+                    }
+                    if (j == 3) {   // WE'LL ADD A DROPDOWN LIST AT THE SECOND COLUMN (FOR Category).
+                        var select = document.createElement('select');
+                        select.setAttribute("id", "in-ship");      
+                        
+                        // CREATE AND ADD A DROPDOWN LIST.
+                        select.innerHTML = '<option value="" selected disabled>Pilih Load</option>';
+                        for (k = 0; k < this.category.length; k++) {
+                            select.innerHTML = select.innerHTML +
+                                '<option value="' + this.category[k] + '">' + this.category[k] + '</option>';
+                        }
+                        newCell.appendChild(select);
+                    }
+                    if (j == 4) {   // WE'LL ADD A DT PICKER AT THE FOURTH COLUMN (FOR Category).
+                         var select = document.createElement('select');
+                        select.setAttribute("id", "in-load");      
+                        
+                        // CREATE AND ADD A DROPDOWN LIST.
+                        select.innerHTML = '<option value="" selected disabled>Pilih Load</option>';
+                        for (k = 0; k < this.category.length; k++) {
+                            select.innerHTML = select.innerHTML +
+                                '<option value="' + this.category[k] + '">' + this.category[k] + '</option>';
+                        }
+                        newCell.appendChild(select);
+                    }
+                    if (j == 5) {
+                        var dt = document.createElement('dt');      // CREATE AND ADD A DROPDOWN LIST.
+                        dt.innerHTML = '<input type="datetime-local" id="in-date">';
+                        newCell.appendChild(dt);
+                    } 
+                    if(j==6){
+                        var tBox = document.createElement('input');          // CREATE AND ADD A TEXTBOX.
+                        tBox.setAttribute('type', 'text');
+                        tBox.setAttribute('value', '');
+                        tBox.setAttribute('id', 'in-item');
+                        newCell.appendChild(tBox);
+                    }
+                    if(j==7){
+                        var tBox = document.createElement('input');          // CREATE AND ADD A TEXTBOX.
+                        tBox.setAttribute('type', 'text');
+                        tBox.setAttribute('value', '');
+                        tBox.setAttribute('id', 'in-keterangan');
+                        newCell.appendChild(tBox);
+                    }
+                }
+            }
+            this.td = document.createElement('td');
+            this.td.setAttribute('colspan', '2');
+            tr.appendChild(this.td);
+
+            var btNew = document.createElement('input');
+
+            btNew.setAttribute('type', 'button');       // SET ATTRIBUTES.
+            btNew.setAttribute('value', 'Create');
+            btNew.setAttribute('id', 'New' + i);
+            btNew.setAttribute('style', 'background-color:#207DD1;');
+            btNew.setAttribute('onclick', 'crudApp.CreateNew(this)');       // ADD THE BUTTON's 'onclick' EVENT.
+            btNew.setAttribute('class', 'btn rounded border');
+            this.td.appendChild(btNew);
+
+            // ADD ROWS USING JSON DATA.
+            for (var i = 0; i < this.myBooks.length; i++) {
+
+                tr = table.insertRow(-1);           // CREATE A NEW ROW.
+
+                for (var j = 0; j < this.col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = this.myBooks[i][this.col[j]];
+                }
+
+                // DYNAMICALLY CREATE AND ADD ELEMENTS TO TABLE CELLS WITH EVENTS.
+
+                this.td = document.createElement('td');
+
+                // *** CANCEL OPTION.
+                tr.appendChild(this.td);
+                var lblCancel = document.createElement('label');
+                lblCancel.innerHTML = '✖';
+                lblCancel.setAttribute('onclick', 'crudApp.Cancel(this)');
+                lblCancel.setAttribute('style', 'display:none;');
+                lblCancel.setAttribute('title', 'Cancel');
+                lblCancel.setAttribute('id', 'lbl' + i);
+                this.td.appendChild(lblCancel);
+
+                // *** SAVE.
+                tr.appendChild(this.td);
+                var btSave = document.createElement('input');
+
+                btSave.setAttribute('type', 'button');      // SET ATTRIBUTES.
+                btSave.setAttribute('value', 'Save');
+                btSave.setAttribute('id', 'Save' + i);
+                btSave.setAttribute('style', 'display:none;');
+                btSave.setAttribute('onclick', 'crudApp.Save(this)');       // ADD THE BUTTON's 'onclick' EVENT.
+                this.td.appendChild(btSave);
+
+                // *** UPDATE.
+                tr.appendChild(this.td);
+                var btUpdate = document.createElement('input');
+
+                btUpdate.setAttribute('type', 'button');    // SET ATTRIBUTES.
+                btUpdate.setAttribute('value', 'Update');
+                btUpdate.setAttribute('id', 'Edit' + i);
+                btUpdate.setAttribute('style', 'background-color:#44CCEB;');
+                btUpdate.setAttribute('onclick', 'crudApp.Update(this)');   // ADD THE BUTTON's 'onclick' EVENT.
+                btUpdate.setAttribute('class', 'btn btn-warning rounded border');   // ADD THE BUTTON's 'onclick' EVENT.
+                this.td.appendChild(btUpdate);
+
+                // *** DELETE.
+                this.td = document.createElement('th');
+                tr.appendChild(this.td);
+                var btDelete = document.createElement('input');
+                btDelete.setAttribute('type', 'button');    // SET INPUT ATTRIBUTE.
+                btDelete.setAttribute('value', 'Delete');
+                btDelete.setAttribute('style', 'background-color:#ED5650;');
+                btDelete.setAttribute('onclick', 'crudApp.Delete(this)');   // ADD THE BUTTON's 'onclick' EVENT.
+                btDelete.setAttribute('class', 'btn btn-danger rounded');   // ADD THE BUTTON's 'onclick' EVENT.
+                this.td.appendChild(btDelete);
+            }
+
+
+            
+            var div = document.getElementById('container');
+            div.innerHTML = '';
+            div.appendChild(table);    // ADD THE TABLE TO THE WEB PAGE.
+        };
+
+        // Ini Untuk Buat Row Insert
+        this.renderInsertRow = (table) => {
+            
+        }
+
+        // ****** OPERATIONS START.
+
+        // CANCEL.
+        this.Cancel = function (oButton) {
+
+            // HIDE THIS BUTTON.
+            oButton.setAttribute('style', 'display:none; float:none;');
+
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+
+            // HIDE THE SAVE BUTTON.
+            var btSave = document.getElementById('Save' + (activeRow - 1));
+            btSave.setAttribute('style', 'display:none;');
+
+            // SHOW THE UPDATE BUTTON AGAIN.
+            var btUpdate = document.getElementById('Edit' + (activeRow - 1));
+            btUpdate.setAttribute('style', 'display:block; margin:0 auto; background-color:#44CCEB;');
+
+            var tab = document.getElementById('booksTable').rows[activeRow];
+
+            for (i = 0; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                td.innerHTML = this.myBooks[(activeRow - 1)][this.col[i]];
+            }
+        }
+
+
+        // EDIT DATA.
+        this.Update = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('booksTable').rows[activeRow];
+
+            // SHOW A DROPDOWN LIST WITH A LIST OF CATEGORIES.
+            for (i = 1; i < 6; i++) {
+                if (i == 2) {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('select');      // DROPDOWN LIST.
+                    ele.innerHTML = '<option value="' + td.innerText + '">' + td.innerText + '</option>';
+                    for (k = 0; k < this.category.length; k++) {
+                        ele.innerHTML = ele.innerHTML +
+                            '<option value="' + this.category[k] + '">' + this.category[k] + '</option>';
+                    }
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+                if (i == 3 ) {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('select');      // DROPDOWN LIST.
+                    ele.innerHTML = '<option value="' + td.innerText + '">' + td.innerText + '</option>';
+                    for (m = 0; m < this.category.length; m++) {
+                        ele.innerHTML = ele.innerHTML +
+                            '<option value="' + this.category[m] + '">' + this.category[m] + '</option>';
+                    }
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+                
+                else {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('input');      // TEXTBOX.
+                    ele.setAttribute('type', 'text');
+                    ele.setAttribute('value', td.innerText);
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+            }
+
+            var lblCancel = document.getElementById('lbl' + (activeRow - 1));
+            lblCancel.setAttribute('style', 'cursor:pointer; display:block; width:20px; float:left; position: absolute;');
+
+            var btSave = document.getElementById('Save' + (activeRow - 1));
+            btSave.setAttribute('style', 'display:block; margin-left:30px; float:left; background-color:#2DBF64;');
+
+            // HIDE THIS BUTTON.
+            oButton.setAttribute('style', 'display:none;');
+        };
+
+
+        // DELETE DATA.
+        this.Delete = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            this.myBooks.splice((activeRow - 1), 1);    // DELETE THE ACTIVE ROW.
+            this.createTable();                         // REFRESH THE TABLE.
+        };
+
+        // SAVE DATA.
+        this.Save = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('booksTable').rows[activeRow];
+
+            // UPDATE myBooks ARRAY WITH VALUES.
+            for (i = 1; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                if (td.childNodes[0].getAttribute('type') == 'text' || td.childNodes[0].tagName == 'SELECT' || td.childNodes[0].getAttribute('type') == 'date') {  // CHECK IF ELEMENT IS A TEXTBOX OR SELECT.
+                    this.myBooks[(activeRow - 1)][this.col[i]] = td.childNodes[0].value;      // SAVE THE VALUE.
+                }
+            }
+            this.createTable();     // REFRESH THE TABLE.
+        }
+
+        // CREATE NEW.
+        this.CreateNew = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('booksTable').rows[activeRow];
+            // <-- Kode Di Bawah Di Hapus Dikang -->
+            // var obj = {};
+            // // ADD NEW VALUE TO myBooks ARRAY.
+            // for (i = 1; i < this.col.length; i++) {
+            //     var td = tab.getElementsByTagName("td")[i];
+            //     if (td.childNodes[0].getAttribute('type') == 'text' || td.childNodes[0].tagName == 'SELECT') {      // CHECK IF ELEMENT IS A TEXTBOX OR SELECT.
+            //         var txtVal = td.childNodes[0].value;
+            //         if (txtVal != '') {
+            //             obj[this.col[i]] = txtVal.trim();
+            //         }
+            //         else {
+            //             obj = '';
+            //             alert('all fields are compulsory');
+            //             break;
+            //         }
+            //     }
+            // }
+            // obj[this.col[0]] = this.myBooks.length + 1;     // NEW ID.
+            // <-- End Of: Kode Di Bawah Di Hapus Dikang -->
+            
+
+            let obj = {
+                'Id': this.myBooks.length + 1,
+                'Car': document.getElementById('in-car').value,
+                'Isotank': document.getElementById('in-isotank').value,
+                'LoadFrom': document.getElementById('in-load').value,
+                'ShipTo': document.getElementById('in-ship').value,
+                'Item': document.getElementById('in-item').value,
+                'Date': document.getElementById('in-date').value,
+                'Keterangan': document.getElementById('in-keterangan').value,
+            }
+            
+
+            if (Object.keys(obj).length > 0) {      // CHECK IF OBJECT IS NOT EMPTY.
+                this.myBooks.push(obj);             // PUSH (ADD) DATA TO THE JSON ARRAY.
+                this.createTable();                 // REFRESH THE TABLE.
+            }
+        }
+
+        // ****** OPERATIONS END.
+    }
+
+    crudApp.createTable();
+
+
+    //expandig form
+    var counter = 0;
+
+    function moreFields() {
+        counter++;
+        var newFields = document.getElementById('readroot').cloneNode(true);
+        newFields.id = '';
+        newFields.style.display = 'block';
+        var newField = newFields.childNodes;
+        for (var i=0;i<newField.length;i++) {
+            var theName = newField[i].name
+            if (theName)
+                newField[i].name = theName + counter;
+        }
+        var insertHere = document.getElementById('writeroot');
+        insertHere.parentNode.insertBefore(newFields,insertHere);
+    }
+
+    window.onload = moreFields;
+</script>
+</html>
