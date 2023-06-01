@@ -291,6 +291,7 @@
             var div = document.getElementById('container');
             div.innerHTML = '';
             div.appendChild(table);    // ADD THE TABLE TO THE WEB PAGE.
+            $('.pop').hide();
         };
 
         // Ini Untuk Buat Row Insert
@@ -322,6 +323,8 @@
                 var td = tab.getElementsByTagName("td")[i];
                 td.innerHTML = this.myBooks[(activeRow - 1)][this.col[i]];
             }
+            $('.pop').hide();
+
         }
 
 
@@ -373,6 +376,8 @@
 
             // HIDE THIS BUTTON.
             oButton.setAttribute('style', 'display:none;');
+            $('.pop').hide();
+
         };
 
 
@@ -380,7 +385,7 @@
         this.Delete = function (oButton) {
             var activeRow = oButton.parentNode.parentNode.rowIndex;
             this.myBooks.splice((activeRow - 1), 1);    // DELETE THE ACTIVE ROW.
-            this.createTable();                         // REFRESH THE TABLE.
+            this.createTable();   
         };
 
         // SAVE DATA.
