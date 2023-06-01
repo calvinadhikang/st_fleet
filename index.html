@@ -3,7 +3,7 @@
 <head>
     <title>CRUD Application using JavaScript</title>
     <link rel="stylesheet" href="./css/bootstrap.css">
-	<script src="./js/jquery-3.6.0.js"></script>
+	<script src="./js/jquery-3.7.0.min.js"></script>
     <script src="./js/bootstrap.js"></script>
     <style>
         table 
@@ -68,6 +68,33 @@
 </body>
 
 <script>
+    $('document').ready(function() {
+        console.log($('.pop'))
+        $('.pop').hide();
+    })
+
+    $(document).on('click', '.showPop', function(e) {
+        $('.pop').hide();
+
+        let target = e.target.getAttribute('idPop');
+        console.log(target)
+
+        let arrayPop = document.querySelectorAll('.pop');
+        arrayPop.forEach(element => {
+            if (element.getAttribute('idPop') == target) {
+                let flag = element.getAttribute('isShown');
+                if (flag == 1) {
+                    element.setAttribute('isShown', 0);
+                    $(element).hide();
+                }else{
+                    element.setAttribute('isShown', 1);
+                    $(element).show();
+                }
+            }
+        });
+        console.log(arrayPop[0])
+    })
+
     var crudApp = new function () {
 
         // AN ARRAY OF JSON OBJECTS WITH VALUES.
@@ -197,7 +224,17 @@
 
                 for (var j = 0; j < this.col.length; j++) {
                     var tabCell = tr.insertCell(-1);
-                    tabCell.innerHTML = this.myBooks[i][this.col[j]];
+
+                    var idData = this.myBooks[i][this.col[0]]
+                    var innerHTML = this.myBooks[i][this.col[j]];
+                    if (j == 1) {
+                        innerHTML += `
+                            <img src="attention.png" style="width: 20px;" class="showPop" idPop="${idData}">
+                            <span class="bg-secondary text-white p-2 rounded pop" idPop="${idData}" isShown="0">Informasi</span>
+                        `
+                    }
+
+                    tabCell.innerHTML = innerHTML;
                 }
 
                 // DYNAMICALLY CREATE AND ADD ELEMENTS TO TABLE CELLS WITH EVENTS.
